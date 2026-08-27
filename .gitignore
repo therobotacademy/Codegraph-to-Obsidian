@@ -5,3 +5,6 @@
 codegraph.*
 obsidian_vault/
 *obsidian_vault/
+
+// Codegraph daemon files
+daemon.*
