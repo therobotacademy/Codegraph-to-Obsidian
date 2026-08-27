@@ -42,8 +42,12 @@ Exports the CodeGraph SQLite property graph (`.codegraph/codegraph.db`) into an 
   - [Bundled Automation Scripts (`scripts/`)](#bundled-automation-scripts-scripts)
   - [7-Step Workflow Protocol](#7-step-workflow-protocol)
   - [Domain Adaptation Matrix](#domain-adaptation-matrix)
-  - [Agent Integration](#agent-integration-1)
 - [Comparison: Choosing the Right Agent Skill](#comparison-choosing-the-right-agent-skill)
+- [Automated Documentation Publishing (`publish_pdf.py`)](#automated-documentation-publishing-publish_pdfpy)
+  - [Scope &amp; Purpose](#scope--purpose)
+  - [Architectural Guarantees &amp; Sizing Controls](#architectural-guarantees--sizing-controls)
+  - [CLI Reference &amp; Usage](#cli-reference--usage)
+  - [Publication Deliverables](#publication-deliverables)
 
 ---
 
@@ -55,6 +59,10 @@ When fully deployed, this is how the folder structure will look like:
 .codegraph/
 ├── export_obsidian.py                     # OKF v0.2 Obsidian vault exporter
 ├── codegraph.db                           # SQLite AST property graph database
+├── scripts/                               # Deterministic publication & export tooling
+│   ├── publish_pdf.py                     # Automated book compiler & vector PDF publisher
+│   ├── README.md                          # Publishing CLI reference & diagram sizing rules
+│   └── assets/                            # Bundled offline assets (print CSS + Mermaid.js)
 ├── docs/                                  # Architectural guides & cheatsheets
 │   ├── cheatsheet-codegraph.md            # CodeGraph CLI command reference
 │   ├── cheatsheet-obsidian.md             # Obsidian vault & Dataview reference
@@ -74,6 +82,9 @@ When fully deployed, this is how the folder structure will look like:
     ├── Architecture.canvas                # 2D visual system flow & component board
     ├── index.md                           # Vault root index & statistics
     ├── DATAVIEW/                          # Persistent queries & architectural cockpit
+    │   ├── EXPORT/                        # Generated PDF & standalone HTML deliverables
+    │   │   ├── Backbone-Architecture-Guide.pdf  # 45-page navigable publication manual
+    │   │   └── Backbone-Architecture-Guide.html # Standalone offline HTML edition
     │   └── Backbone/                      # Universal 5-tier living cockpit
     │       ├── index.md                   # Cockpit master dashboard & telemetry
     │       ├── 00-Navigation/             # Spatial exploration, maps & narrative journeys
@@ -123,8 +134,6 @@ codegraph install --print-config codex          # Print snippet without file wri
 #### Restart Agent
 
 Restart your agent / IDE (e.g. Antigravity IDE, Claude Code, Cursor) so the new MCP server is recognized.
-
----
 
 ### 2. Index a Project
 
@@ -320,9 +329,8 @@ The repository includes in-depth guides and architectural references under [`doc
   - Local Graph (`depth 1-2`): Immediate inbound callers and outbound callees for the active note.
   - Hover Previews (`Ctrl + Hover`): Inline docstrings and signatures without losing context.
   - Direct Source Links: Clickable `file:///` URIs jump straight to source line numbers in the IDE.
-- **Dataview Recipes**: Pre-built queries for class indexing, inbound coupling hotspots, and missing docstrings.
-
-<a id="3-codegraph-vs-obsidian-comparison"></a>
+- **Dataview Recipes**: Pre-built queries for class indexing, inbound coupling hotspots, and missing docstrings
+  <a id="3-codegraph-vs-obsidian-comparison"></a>
 
 ### 3. CodeGraph vs. Obsidian Comparison ([`docs/Codegraph-vs-Obdidian.md`](docs/Codegraph-vs-Obdidian.md))
 
@@ -579,3 +587,113 @@ To make the skill available to AI assistants:
 | **Narrative Traces**   | Summary notes & findings                                | 3 archetypal execution journeys with line anchors            |
 | **Automation Tooling** | Direct agent prompt & DQL/DataviewJS                    | Bundled Python survey, canvas generator, and link auditor    |
 | **Static Fallback**    | Optional                                                | Required (resilient static markdown tables in all nodes)     |
+
+---
+
+## Automated Documentation Publishing (`publish_pdf.py`)
+
+### Scope & Purpose
+
+While the Obsidian vault provides an interactive, live-querying knowledge graph inside the developer environment, external stakeholders—including **auditors, compliance reviewers, executive sponsors, and offline clients**—require a frozen, portable, self-contained publication.
+
+The publishing script located at [`.codegraph/scripts/publish_pdf.py`](scripts/publish_pdf.py) acts as a deterministic compiler that bridges this gap:
+
+* **Interactive Layer (Obsidian)**: Living DQL queries, canvas exploration, and editable symbol notes.
+* **Publication Layer (`publish_pdf.py`)**: Standalone, frozen, 45-page vector PDF manual with clickable PDF bookmarks, internal cross-references, zebra-striped data tables, and high-resolution architecture diagrams.
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│               Living Obsidian Knowledge Vault                  │
+│       (Interactive Dataview, 2D Canvas, Atomic Notes)         │
+└───────────────────────────────┬────────────────────────────────┘
+                                │
+                                ▼  publish_pdf.py
+┌────────────────────────────────────────────────────────────────┐
+│           Formal Technical Architecture Manual (PDF)           │
+│   • 38–45 Pages Vector PDF via Headless Edge/Chrome            │
+│   • Interactive PDF Bookmarks & In-Document Anchor Jumps       │
+│   • Zero Micro-Print: Full-Bleed Scaled Mermaid Diagrams       │
+│   • Standalone Offline HTML Edition (Bundled Assets)           │
+└────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Architectural Guarantees & Sizing Controls
+
+To ensure that the generated PDF generalizes across any codebase without layout glitches, `publish_pdf.py` enforces four deterministic controls:
+
+#### 1. Zero Pandoc Escaping Corruption
+
+Pandoc's HTML parser natively escapes characters inside code blocks (`-->` becomes `--&gt;`, `"` becomes `&quot;`, `<<` becomes `&lt;&lt;`), which crashes Mermaid's syntax lexer. `publish_pdf.py` extracts all ``mermaid`` blocks **before** Pandoc executes, processes the markdown text, and re-injects the pristine, unescaped diagram markup into `<div class="mermaid">` containers.
+
+#### 2. Full-Bleed Responsive Vector SVGs
+
+Mermaid defaults to hardcoded inline `max-width` attributes that constrain diagrams to narrow pixel widths. The publisher overrides this by:
+
+* Initializing Mermaid with `useMaxWidth: false` across all diagram models (`flowchart`, `sequence`, `state`, `class`).
+* Forcing `.mermaid svg { width: 100% !important; max-width: 100% !important; height: auto !important; }` in [`assets/book_style.css`](scripts/assets/book_style.css).
+* Diagrams naturally scale to the full 186 mm printable width of the A4 page.
+
+#### 3. Authoring Rules for Balanced Aspect Ratios
+
+To avoid diagrams appearing disproportionately small in print, diagrams must follow the **Golden Aspect Ratio rule ($0.35 \le H/W \le 1.0$)**:
+
+* **Wide Class Hierarchies**: Never chain 6+ class hierarchies horizontally ($W > 1500\text{ px}, H < 400\text{ px}$), as scaling down to A4 shrinks text to $< 40\%$ micro-print. Split wide models into focused subsystem diagrams (e.g. *Perception Contracts* vs. *Governance & Persistence Contracts*).
+* **Deep Execution Chains**: Avoid chaining 10+ items vertically in a single column ($W < 600\text{ px}, H > 900\text{ px}$), which creates a tall skinny column that fights for vertical page space. Use `flowchart TD` with side-by-side subgraphs (`P1 & P2 & P3`) to spread nodes across a balanced grid.
+
+#### 4. Automatic Link & Token Transmutation
+
+* **Wikilinks $\to$ PDF Anchors**: Obsidian `[[Target|Label]]` links are converted to `<a href="#ch-target">Label</a>`, turning all cross-references into native clickable jumps inside the PDF.
+* **Token Neutralization**: Colliding stereotyping tokens (e.g. `<<Protocol>>`) inside node labels are neutralized to safe labels (`Protocol:`) to guarantee zero Mermaid parsing exceptions.
+* **Hermetic Offline Bundling**: Ships with local [`assets/mermaid.min.js`](scripts/assets/mermaid.min.js) and [`assets/book_style.css`](scripts/assets/book_style.css).
+
+---
+
+### CLI Reference & Usage
+
+#### Default Invocation
+
+Publishes the current repository's Backbone cockpit:
+
+```bash
+python .codegraph/scripts/publish_pdf.py
+```
+
+#### Generalizing to Any Other Repository
+
+Point the publisher to any documentation folder or vault:
+
+```bash
+python .codegraph/scripts/publish_pdf.py \
+  --backbone-dir "path/to/documentation/Backbone" \
+  --output "path/to/export/System-Architecture-Guide.pdf" \
+  --title "My Service Name" \
+  --subtitle "Microservice Architecture, Domain Contracts & Operational Manual" \
+  --badge "Technical Architecture Specification" \
+  --repo "organization/repository-name"
+```
+
+| Argument           | Default                                                 | Description                                                    |
+| :----------------- | :------------------------------------------------------ | :------------------------------------------------------------- |
+| `--backbone-dir` | `.codegraph/67-obsidian_vault/DATAVIEW/Backbone`      | Source directory containing documentation notes.               |
+| `--output`       | `.../DATAVIEW/EXPORT/Backbone-Architecture-Guide.pdf` | Destination path for the generated PDF.                        |
+| `--assets-dir`   | `.codegraph/scripts/assets`                           | Directory containing`book_style.css` and `mermaid.min.js`. |
+| `--title`        | `"Agent Governance Framework"`                        | Title printed on cover page and headers.                       |
+| `--subtitle`     | `"Architectural Backbone..."`                         | Subtitle printed on cover page.                                |
+| `--badge`        | `"Technical Specification & Reference Guide"`         | Cover badge label.                                             |
+| `--repo`         | `"67-Agent-Governance-Framework-CODE"`                | Repository name in metadata block.                             |
+
+---
+
+### Publication Deliverables
+
+When executed on this repository, the compiler produces two frozen deliverables under [`DATAVIEW/EXPORT/`](67-obsidian_vault/DATAVIEW/EXPORT/):
+
+1. [**`Backbone-Architecture-Guide.pdf`**](67-obsidian_vault/DATAVIEW/EXPORT/Backbone-Architecture-Guide.pdf) (2.05 MB, 45 pages):
+   - **Cover & Metadata**: Formal title page with edition and provenance.
+   - **Interactive Table of Contents**: Clickable outline jumps directly to any of the 13 chapters.
+   - **12 Vector Architecture Diagrams**: Crisp SVGs spanning the full page width without pixelation or micro-text.
+   - **Pre-Rendered Reference Tables**: All 99 OOP classes, 6 boundary protocols, and statutory registries formatted with zebra striping and repeated headers.
+2. [**`Backbone-Architecture-Guide.html`**](67-obsidian_vault/DATAVIEW/EXPORT/Backbone-Architecture-Guide.html):
+   - Single-file standalone HTML edition embedding the local Mermaid engine and stylesheet for browser viewing without requiring an active server.

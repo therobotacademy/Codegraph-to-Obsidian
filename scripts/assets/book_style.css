@@ -1,0 +1,308 @@
+/* Publication-grade CSS for Technical Architectural Documentation */
+
+@page {
+  size: A4;
+  margin: 18mm 12mm 18mm 12mm;
+  @bottom-right {
+    content: counter(page);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 8pt;
+    color: #64748b;
+  }
+  @bottom-left {
+    content: "Agent Governance Framework — Architectural Backbone Specification";
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 8pt;
+    color: #64748b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Inter', Roboto, sans-serif;
+  color: #1e293b;
+  line-height: 1.6;
+  font-size: 10.5pt;
+  margin: 0;
+  padding: 0;
+}
+
+/* Cover Page */
+.cover-page {
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  page-break-after: always;
+  padding: 40px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #f8fafc;
+  border-radius: 8px;
+}
+
+.cover-title {
+  font-size: 32pt;
+  font-weight: 800;
+  margin-bottom: 15px;
+  color: #38bdf8;
+  letter-spacing: -0.5px;
+}
+
+.cover-subtitle {
+  font-size: 16pt;
+  font-weight: 400;
+  color: #94a3b8;
+  margin-bottom: 40px;
+  max-width: 650px;
+}
+
+.cover-meta {
+  margin-top: 60px;
+  border-top: 1px solid #334155;
+  padding-top: 25px;
+  font-size: 10pt;
+  color: #94a3b8;
+}
+
+.cover-meta p {
+  margin: 5px 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: #0369a1;
+  color: white;
+  border-radius: 9999px;
+  font-size: 9pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+
+/* Table of Contents */
+.toc-section {
+  page-break-after: always;
+  margin-top: 30px;
+}
+
+.toc-title {
+  font-size: 20pt;
+  font-weight: 700;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 8px;
+  margin-bottom: 25px;
+  color: #0f172a;
+}
+
+.toc-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.toc-item {
+  display: flex;
+  justify-content: space-between;
+  text-decoration: none;
+  color: #0f172a;
+  border-bottom: 1px dotted #cbd5e1;
+  padding-bottom: 4px;
+}
+
+.toc-item:hover {
+  color: #0284c7;
+}
+
+.toc-item .part-name {
+  font-weight: 600;
+}
+
+.toc-item .part-desc {
+  color: #64748b;
+  font-size: 9pt;
+}
+
+/* Chapters & Typography */
+.chapter {
+  page-break-before: always;
+  padding-top: 10px;
+}
+
+h1 {
+  font-size: 22pt;
+  font-weight: 800;
+  color: #0f172a;
+  border-bottom: 2px solid #0284c7;
+  padding-bottom: 8px;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+h2 {
+  font-size: 15pt;
+  font-weight: 700;
+  color: #1e293b;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 6px;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  page-break-after: avoid;
+}
+
+h3 {
+  font-size: 12pt;
+  font-weight: 600;
+  color: #334155;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  page-break-after: avoid;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 9pt;
+  page-break-inside: auto;
+}
+
+tr {
+  page-break-inside: avoid;
+  page-break-after: auto;
+}
+
+thead {
+  display: table-header-group;
+}
+
+th {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  font-weight: 700;
+  text-align: left;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+}
+
+td {
+  padding: 7px 10px;
+  border: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+/* Code & Syntax */
+code {
+  font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+  font-size: 8.5pt;
+  background-color: #f1f5f9;
+  color: #0f172a;
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+pre {
+  background-color: #0f172a;
+  color: #f8fafc;
+  padding: 14px;
+  border-radius: 6px;
+  overflow-x: hidden;
+  font-size: 8.5pt;
+  line-height: 1.45;
+  margin: 15px 0;
+  page-break-inside: avoid;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+  border: none;
+}
+
+/* Quotes / Callouts */
+blockquote {
+  margin: 15px 0;
+  padding: 10px 16px;
+  background-color: #f0fdf4;
+  border-left: 4px solid #16a34a;
+  color: #166534;
+  border-radius: 0 6px 6px 0;
+  font-size: 9.5pt;
+}
+
+.callout-info {
+  background-color: #f0f9ff;
+  border-left: 4px solid #0284c7;
+  color: #075985;
+}
+
+.callout-warn {
+  background-color: #fffbeb;
+  border-left: 4px solid #d97706;
+  color: #92400e;
+}
+
+/* Internal Links */
+a {
+  color: #0284c7;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Mermaid Diagrams — Full Page Width */
+.mermaid-container {
+  width: 100%;
+  margin: 20px 0 30px 0;
+  page-break-inside: avoid;
+  background-color: #ffffff;
+  padding: 16px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+}
+
+.mermaid {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.mermaid svg {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  display: block;
+  margin: 0 auto;
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background: #e2e8f0;
+  margin: 25px 0;
+}
